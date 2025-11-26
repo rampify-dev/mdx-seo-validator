@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import type { ParsedDocument, ValidationData, Category, Rule } from '../types';
 
 export function validateSEO(
@@ -33,6 +34,11 @@ export function validateSEO(
   // Calculate overall score
   const score = calculateScore(categories);
 
+  // Get site domain from configuration
+  const config = vscode.workspace.getConfiguration('seo');
+  const siteDomain = config.get<string>('siteDomain') || 'example.com';
+  const breadcrumb = `${siteDomain} › blog › post`;
+
   return {
     title: {
       text: title,
@@ -47,7 +53,7 @@ export function validateSEO(
       truncated: descTruncated
     },
     url: {
-      breadcrumb: 'example.com › blog › post', // TODO: Get from config
+      breadcrumb,
       status: 'optimal'
     },
     favicon: faviconInfo,
