@@ -84,7 +84,7 @@ export function findMetadataFiles(mdxFilePath: string, framework: Framework): st
   const dir = path.dirname(mdxFilePath);
 
   if (framework === 'nextjs-app') {
-    // Look for page.tsx/page.ts in same directory
+    // First, try same directory (for MDX files inside app/)
     const pageTsx = path.join(dir, 'page.tsx');
     const pageTs = path.join(dir, 'page.ts');
 
@@ -92,6 +92,38 @@ export function findMetadataFiles(mdxFilePath: string, framework: Framework): st
       files.push(pageTsx);
     } else if (fs.existsSync(pageTs)) {
       files.push(pageTs);
+    }
+
+    // Check if MDX is in a content directory (common pattern)
+    // e.g., content/blog/my-post.mdx → look for app/blog/[slug]/page.tsx
+    if (mdxFilePath.includes('/content/')) {
+      const projectRoot = findProjectRoot(mdxFilePath);
+      if (projectRoot) {
+        const appDir = path.join(projectRoot, 'app');
+
+        // Extract the content subdirectory (e.g., "blog" from "content/blog/post.mdx")
+        const contentMatch = mdxFilePath.match(/\/content\/([^/]+)/);
+        if (contentMatch && fs.existsSync(appDir)) {
+          const contentSubdir = contentMatch[1]; // e.g., "blog"
+
+          // Common patterns for dynamic routes
+          const dynamicPatterns = [
+            path.join(appDir, contentSubdir, '[slug]', 'page.tsx'),
+            path.join(appDir, contentSubdir, '[slug]', 'page.ts'),
+            path.join(appDir, contentSubdir, '[...slug]', 'page.tsx'),
+            path.join(appDir, contentSubdir, '[...slug]', 'page.ts'),
+            path.join(appDir, contentSubdir, 'page.tsx'),
+            path.join(appDir, contentSubdir, 'page.ts'),
+          ];
+
+          for (const pattern of dynamicPatterns) {
+            if (fs.existsSync(pattern) && !files.includes(pattern)) {
+              files.push(pattern);
+              break; // Found one, that's enough
+            }
+          }
+        }
+      }
     }
 
     // Look for layout.tsx/layout.ts in same and parent directories
@@ -126,4 +158,34 @@ export function findMetadataFiles(mdxFilePath: string, framework: Framework): st
   }
 
   return files;
+}
+
+/**
+ * Find the project root directory (where package.json or config files are)
+ */
+function findProjectRoot(filePath: string): string | null {
+  let currentDir = path.dirname(filePath);
+  const rootDir = path.parse(filePath).root;
+
+  while (currentDir !== rootDir) {
+    // Check for common project root indicators
+    const indicators = [
+      'package.json',
+      'next.config.js',
+      'next.config.ts',
+      'next.config.mjs'
+    ];
+
+    for (const indicator of indicators) {
+      if (fs.existsSync(path.join(currentDir, indicator))) {
+        return currentDir;
+      }
+    }
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) break; // Reached root
+    currentDir = parentDir;
+  }
+
+  return null;
 }

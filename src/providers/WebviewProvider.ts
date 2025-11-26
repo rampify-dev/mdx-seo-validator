@@ -91,13 +91,16 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     let frameworkMetadata;
     if (workspaceFolder) {
       const framework = await detectFramework(workspaceFolder);
+      console.log('[SEO Validator] Framework detected:', framework.type);
 
       if (framework.type !== 'unknown') {
         const metadataFiles = findMetadataFiles(document.uri.fsPath, framework.type);
+        console.log('[SEO Validator] Metadata files found:', metadataFiles);
 
         if (metadataFiles.length > 0) {
           // Parse the first metadata file found (usually page.tsx or layout.tsx)
           const extractedMetadata = parseNextJsMetadata(metadataFiles[0]);
+          console.log('[SEO Validator] Extracted metadata:', extractedMetadata);
 
           if (extractedMetadata) {
             const validation = validateMetadata(extractedMetadata);
@@ -117,8 +120,14 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
               issues: validation.issues,
               suggestions: validation.suggestions
             };
+
+            console.log('[SEO Validator] Framework metadata:', frameworkMetadata);
           }
+        } else {
+          console.log('[SEO Validator] No metadata files found for:', document.uri.fsPath);
         }
+      } else {
+        console.log('[SEO Validator] Unknown framework - no metadata detection');
       }
     }
 
