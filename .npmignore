@@ -1,0 +1,24 @@
+# Source files (only ship dist/)
+src/
+tsconfig.json
+
+# Development files
+.vscode/
+.vscode-test/
+test.mdx
+*.log
+
+# Build artifacts
+node_modules/
+*.vsix
+
+# Git files
+.git/
+.gitignore
+
+# Documentation (keep README, LICENSE, CHANGELOG)
+# Everything else is excluded by default
+
+# OS files
+.DS_Store
+Thumbs.db
