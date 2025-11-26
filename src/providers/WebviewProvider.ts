@@ -346,7 +346,7 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 
   <div class="footer">
     Powered by <a href="https://rampify.dev" id="rampify-link">Rampify</a> •
-    <a href="https://github.com/rampify/mdx-seo-validator" id="github-link">Open Source</a>
+    <a href="https://github.com/rampify-dev/mdx-seo-validator" id="github-link">Open Source</a>
   </div>
 
   <script>
@@ -459,7 +459,7 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 
     document.getElementById('github-link').addEventListener('click', (e) => {
       e.preventDefault();
-      vscode.postMessage({ type: 'open-url', url: 'https://github.com/rampify/mdx-seo-validator' });
+      vscode.postMessage({ type: 'open-url', url: 'https://github.com/rampify-dev/mdx-seo-validator' });
     });
 
     // Tell extension we're ready

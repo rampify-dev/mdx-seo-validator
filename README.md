@@ -41,7 +41,7 @@ Automatically detects favicons in:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/rampify/mdx-seo-validator.git
+   git clone https://github.com/rampify-dev/mdx-seo-validator.git
    cd mdx-seo-validator
    ```
 

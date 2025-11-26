@@ -99,11 +99,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rampify/mdx-seo-validator"
+    "url": "https://github.com/rampify-dev/mdx-seo-validator"
   },
   "homepage": "https://rampify.dev",
   "bugs": {
-    "url": "https://github.com/rampify/mdx-seo-validator/issues"
+    "url": "https://github.com/rampify-dev/mdx-seo-validator/issues"
   },
   "galleryBanner": {
     "color": "#0e639c",
