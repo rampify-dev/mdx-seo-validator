@@ -1,0 +1,109 @@
+{
+  "name": "mdx-seo-validator",
+  "displayName": "MDX SEO Validator",
+  "description": "Real-time SEO validation for MDX/Markdown files with live Google search preview",
+  "version": "0.1.0",
+  "publisher": "rampify",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "seo",
+    "mdx",
+    "markdown",
+    "validation",
+    "meta tags",
+    "schema.org"
+  ],
+  "activationEvents": [
+    "onLanguage:mdx",
+    "onLanguage:markdown"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "seo.openPreview",
+        "title": "SEO: Open Preview Panel",
+        "icon": "$(search)"
+      },
+      {
+        "command": "seo.validateFile",
+        "title": "SEO: Validate Current File"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "seo-validator",
+          "title": "SEO Validator",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "seo-validator": [
+        {
+          "type": "webview",
+          "id": "seoPreview",
+          "name": "SEO Preview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "MDX SEO Validator",
+      "properties": {
+        "seo.framework": {
+          "type": "string",
+          "default": "auto",
+          "enum": ["auto", "nextjs-app", "nextjs-pages", "astro", "remix", "generic"],
+          "description": "Framework detection mode"
+        },
+        "seo.siteDomain": {
+          "type": "string",
+          "default": "example.com",
+          "description": "Your site domain (for URL preview)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "npm run build:extension && npm run build:webview",
+    "build:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "build:webview": "cd webview && npx vite build",
+    "watch": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
+    "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
+    "watch:webview": "cd webview && vite build --watch",
+    "dev": "npm run watch",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/vsce": "^2.22.0",
+    "concurrently": "^8.2.2",
+    "esbuild": "^0.19.8",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "unified": "^11.0.4",
+    "remark-parse": "^11.0.0",
+    "remark-mdx": "^3.0.0",
+    "remark-frontmatter": "^5.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rampify/mdx-seo-validator"
+  }
+}

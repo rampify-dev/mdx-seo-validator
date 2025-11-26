@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <!-- Simplified "R" inspired by Rampify logo -->
+  <path
+    d="M 7 6 L 7 18 M 7 6 L 13 6 C 14.5 6 15.5 7 15.5 8.5 C 15.5 10 14.5 11 13 11 L 7 11 M 13 11 L 17 18"
+    stroke="#d4d4d4"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"/>
+
+  <!-- Blue underline (Rampify brand color) -->
+  <rect x="6" y="19" width="12" height="2" fill="#0e639c" rx="1"/>
+</svg>
