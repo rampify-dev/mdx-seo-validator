@@ -30,8 +30,16 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
         case 'ready':
           // Webview is ready, send initial data
           const editor = vscode.window.activeTextEditor;
-          if (editor) {
+          if (editor && (editor.document.languageId === 'mdx' || editor.document.languageId === 'markdown')) {
             this.validateDocument(editor.document);
+          } else {
+            // No valid file open, show prompt
+            this._view?.webview.postMessage({
+              type: 'no-file',
+              message: editor
+                ? 'Open an MDX or Markdown file to see SEO validation'
+                : 'Open an MDX or Markdown file to see SEO validation'
+            });
           }
           break;
 
@@ -45,6 +53,15 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 
   public async validateDocument(document: vscode.TextDocument) {
     if (!this._view) {
+      return;
+    }
+
+    // Only validate MDX and Markdown files
+    if (document.languageId !== 'mdx' && document.languageId !== 'markdown') {
+      this._view.webview.postMessage({
+        type: 'no-file',
+        message: 'Open an MDX or Markdown file to see SEO validation'
+      });
       return;
     }
 
@@ -284,9 +301,31 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     .footer a:hover {
       text-decoration: underline;
     }
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--vscode-descriptionForeground);
+    }
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state-message {
+      font-size: 14px;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
+  <div id="empty-state" class="empty-state" style="display: none;">
+    <div class="empty-state-icon">📄</div>
+    <div class="empty-state-message" id="empty-state-text">
+      Open an MDX or Markdown file to see SEO validation
+    </div>
+  </div>
+
+  <div id="content-sections">
   <div class="section">
     <h2>Google Search Preview</h2>
     <div class="google-preview">
@@ -348,6 +387,7 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     Powered by <a href="https://rampify.dev" id="rampify-link">Rampify</a> •
     <a href="https://github.com/rampify-dev/mdx-seo-validator" id="github-link">Open Source</a>
   </div>
+  </div><!-- end content-sections -->
 
   <script>
     const vscode = acquireVsCodeApi();
@@ -356,9 +396,23 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     window.addEventListener('message', event => {
       const message = event.data;
       if (message.type === 'validation-update') {
+        showContent();
         updateUI(message.data);
+      } else if (message.type === 'no-file') {
+        showEmptyState(message.message);
       }
     });
+
+    function showEmptyState(message) {
+      document.getElementById('empty-state').style.display = 'block';
+      document.getElementById('content-sections').style.display = 'none';
+      document.getElementById('empty-state-text').textContent = message;
+    }
+
+    function showContent() {
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('content-sections').style.display = 'block';
+    }
 
     function updateUI(data) {
       if (!data) return;

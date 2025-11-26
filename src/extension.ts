@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Auto-validate when active editor changes
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((editor) => {
-      if (editor && (editor.document.languageId === 'mdx' || editor.document.languageId === 'markdown')) {
+      if (editor) {
         provider.validateDocument(editor.document);
       }
     })
