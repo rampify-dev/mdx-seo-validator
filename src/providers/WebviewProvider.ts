@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { parseDocument } from '../parsers/mdxParser';
 import { validateSEO } from '../validators/seoValidator';
 import { detectFavicon, getFaviconDataUri } from '../utils/faviconDetector';
+import { detectFramework, findMetadataFiles } from '../utils/frameworkDetector';
+import { parseNextJsMetadata, validateMetadata, type ExtractedMetadata } from '../utils/metadataParser';
 
 export class SEOWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'seoPreview';
@@ -85,8 +87,43 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
       }
     }
 
+    // Detect framework and parse metadata files
+    let frameworkMetadata;
+    if (workspaceFolder) {
+      const framework = await detectFramework(workspaceFolder);
+
+      if (framework.type !== 'unknown') {
+        const metadataFiles = findMetadataFiles(document.uri.fsPath, framework.type);
+
+        if (metadataFiles.length > 0) {
+          // Parse the first metadata file found (usually page.tsx or layout.tsx)
+          const extractedMetadata = parseNextJsMetadata(metadataFiles[0]);
+
+          if (extractedMetadata) {
+            const validation = validateMetadata(extractedMetadata);
+
+            frameworkMetadata = {
+              framework: framework.type,
+              hasMetadata: extractedMetadata.source !== 'none',
+              fileName: extractedMetadata.fileName,
+              source: extractedMetadata.source,
+              fields: {
+                title: extractedMetadata.hasTitle,
+                description: extractedMetadata.hasDescription,
+                canonical: extractedMetadata.hasCanonical,
+                openGraph: extractedMetadata.hasOpenGraph
+              },
+              score: validation.score,
+              issues: validation.issues,
+              suggestions: validation.suggestions
+            };
+          }
+        }
+      }
+    }
+
     // Validate SEO
-    const validation = validateSEO(parsed, faviconInfo);
+    const validation = validateSEO(parsed, faviconInfo, frameworkMetadata);
 
     // Send to webview
     this._view.webview.postMessage({
@@ -378,6 +415,11 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     </div>
   </div>
 
+  <div class="section" id="framework-section" style="display: none;">
+    <h2>Framework Metadata</h2>
+    <div id="framework-content"></div>
+  </div>
+
   <div class="section">
     <h2>Validation Rules</h2>
     <div id="categories"></div>
@@ -502,6 +544,75 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
             </div>
           \`;
         }).join('');
+      }
+
+      // Update framework metadata section
+      if (data.frameworkMetadata && data.frameworkMetadata.hasMetadata) {
+        const fm = data.frameworkMetadata;
+        document.getElementById('framework-section').style.display = 'block';
+
+        const frameworkName = {
+          'nextjs-app': 'Next.js App Router',
+          'nextjs-pages': 'Next.js Pages Router',
+          'astro': 'Astro',
+          'remix': 'Remix'
+        }[fm.framework] || fm.framework;
+
+        let html = \`
+          <div style="margin-bottom: 12px; font-size: 12px; color: var(--vscode-descriptionForeground);">
+            <strong>\${frameworkName}</strong> • \${fm.fileName}
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <span style="font-size: 11px; color: var(--vscode-descriptionForeground);">Type:</span>
+            <span style="font-size: 12px; padding: 2px 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+              \${fm.source === 'generateMetadata' ? 'generateMetadata()' : 'static metadata'}
+            </span>
+          </div>
+        \`;
+
+        // Show fields detected
+        html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 12px;">';
+
+        const fields = [
+          { name: 'Title', value: fm.fields.title },
+          { name: 'Description', value: fm.fields.description },
+          { name: 'Canonical', value: fm.fields.canonical },
+          { name: 'Open Graph', value: fm.fields.openGraph }
+        ];
+
+        fields.forEach(field => {
+          const icon = field.value ? '✓' : '✗';
+          const color = field.value ? '#4ec9b0' : '#f48771';
+          html += \`
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="color: \${color}; font-weight: bold;">\${icon}</span>
+              <span>\${field.name}</span>
+            </div>
+          \`;
+        });
+
+        html += '</div>';
+
+        // Show issues and suggestions
+        if (fm.issues && fm.issues.length > 0) {
+          html += '<div style="margin-top: 12px; padding: 8px; background: rgba(244, 135, 113, 0.1); border-left: 3px solid #f48771; font-size: 11px;">';
+          fm.issues.forEach(issue => {
+            html += \`<div style="margin-bottom: 4px;">• \${issue}</div>\`;
+          });
+          html += '</div>';
+        }
+
+        if (fm.suggestions && fm.suggestions.length > 0) {
+          html += '<div style="margin-top: 8px; padding: 8px; background: rgba(206, 145, 120, 0.1); border-left: 3px solid #ce9178; font-size: 11px;">';
+          fm.suggestions.forEach(suggestion => {
+            html += \`<div style="margin-bottom: 4px;">💡 \${suggestion}</div>\`;
+          });
+          html += '</div>';
+        }
+
+        document.getElementById('framework-content').innerHTML = html;
+      } else {
+        document.getElementById('framework-section').style.display = 'none';
       }
     }
 

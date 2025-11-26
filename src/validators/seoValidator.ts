@@ -3,7 +3,8 @@ import type { ParsedDocument, ValidationData, Category, Rule } from '../types';
 
 export function validateSEO(
   parsed: ParsedDocument,
-  faviconInfo?: { exists: boolean; dataUri?: string; type?: string }
+  faviconInfo?: { exists: boolean; dataUri?: string; type?: string },
+  frameworkMetadata?: any
 ): ValidationData {
   const { frontmatter, headings, images, links } = parsed;
 
@@ -58,7 +59,8 @@ export function validateSEO(
     },
     favicon: faviconInfo,
     score,
-    categories
+    categories,
+    frameworkMetadata
   };
 }
 
