@@ -10,7 +10,7 @@ A VS Code extension that helps you write SEO-optimized content by showing exactl
 
 ## Features
 
-### 🔍 Live Google Search Preview
+### Live Google Search Preview
 See exactly how your page will appear in search results as you type, including:
 - Favicon (auto-detected from your project)
 - Site domain and breadcrumb URL
@@ -18,17 +18,17 @@ See exactly how your page will appear in search results as you type, including:
 - Meta description with character count (150-160 optimal)
 - Color-coded progress bars (green/yellow/red)
 
-### 📊 SEO Score & Validation
+### SEO Score & Validation
 Get instant feedback with:
 - Overall SEO score (0-100)
 - Category breakdown (Meta Tags, Content, Images, Links)
 - Detailed rule-by-rule validation
 - Clear indicators of what's passing and failing
 
-### ⚡ Real-Time Updates
+### Real-Time Updates
 Validation happens as you type (300ms debounce) with no manual refresh needed.
 
-### 🎨 Framework Aware
+### Framework Aware
 Automatically detects favicons in:
 - Next.js (App Router: `app/favicon.ico`, `app/icon.svg`)
 - Next.js (Pages Router: `public/favicon.ico`)
@@ -126,10 +126,10 @@ Configure in VS Code settings (`Cmd+,` → search "SEO"):
 
 This extension uses **vanilla HTML/CSS/JavaScript** for the webview instead of a framework like React. This is an intentional design choice for:
 
-- ⚡ **Performance**: <100ms load time vs 2-10s with bundled frameworks
-- 🎯 **Simplicity**: Single-file webview, no build complexity
-- 📦 **Size**: ~10KB inline HTML vs 500KB+ framework bundles
-- 🔧 **Maintainability**: Standard web APIs, no framework lock-in
+- **Performance**: <100ms load time vs 2-10s with bundled frameworks
+- **Simplicity**: Single-file webview, no build complexity
+- **Size**: ~10KB inline HTML vs 500KB+ framework bundles
+- **Maintainability**: Standard web APIs, no framework lock-in
 
 For this focused use case (live SEO preview), vanilla JS provides the best developer and user experience.
 
@@ -210,7 +210,6 @@ While this extension validates individual MDX/Markdown files, Rampify offers **s
 
 - ✅ **Comprehensive Site Audits** - Crawl your entire site, detect 100+ SEO issues
 - ✅ **Google Search Console Integration** - Real-time indexing status, search analytics
-- ✅ **AI-Powered Insights** - Get actionable recommendations, not just raw data
 - ✅ **Schema.org Generation** - Auto-generate valid JSON-LD for any page type
 - ✅ **Content Strategy** - Discover keyword gaps, cannibalization issues
 - ✅ **MCP Integration** - Bring SEO intelligence directly into Claude Code, Cursor, Windsurf
