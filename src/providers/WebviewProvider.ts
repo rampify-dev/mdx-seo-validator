@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { parseDocument } from '../parsers/mdxParser';
 import { validateSEO } from '../validators/seoValidator';
 import { detectFavicon, getFaviconDataUri } from '../utils/faviconDetector';
-import type { ValidationData } from '../types';
 
 export class SEOWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'seoPreview';
@@ -13,7 +12,7 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
-    context: vscode.WebviewViewResolveContext,
+    _context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
   ) {
     this._view = webviewView;
@@ -23,26 +22,16 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [this._extensionUri]
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = this._getHtmlForWebview();
 
     // Handle messages from the webview
     webviewView.webview.onDidReceiveMessage((data) => {
-      switch (data.type) {
-        case 'ready':
-          // Webview is ready, send initial data
-          const editor = vscode.window.activeTextEditor;
-          if (editor) {
-            this.validateDocument(editor.document);
-          }
-          break;
-
-        case 'apply-fix':
-          this.applyQuickFix(data.ruleId, data.line);
-          break;
-
-        case 'jump-to-line':
-          this.jumpToLine(data.line);
-          break;
+      if (data.type === 'ready') {
+        // Webview is ready, send initial data
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+          this.validateDocument(editor.document);
+        }
       }
     });
   }
@@ -82,21 +71,7 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  private applyQuickFix(ruleId: string, line: number) {
-    // TODO: Implement quick fixes
-    vscode.window.showInformationMessage(`Applying fix for ${ruleId} at line ${line}`);
-  }
-
-  private jumpToLine(line: number) {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
-      const position = new vscode.Position(line, 0);
-      editor.selection = new vscode.Selection(position, position);
-      editor.revealRange(new vscode.Range(position, position));
-    }
-  }
-
-  private _getHtmlForWebview(webview: vscode.Webview, data?: any) {
+  private _getHtmlForWebview() {
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -223,12 +198,6 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     .status-optimal { color: #4ec9b0; }
     .status-warning { color: #ce9178; }
     .status-error { color: #f48771; }
-    .bg-optimal { background: #4ec9b0; }
-    .bg-warning { background: #ce9178; }
-    .bg-error { background: #f48771; }
-    .score-bar {
-      margin-top: 8px;
-    }
     .score-value {
       font-size: 24px;
       font-weight: bold;
@@ -461,13 +430,4 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 </body>
 </html>`;
   }
-}
-
-function getNonce() {
-  let text = '';
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 32; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
 }
