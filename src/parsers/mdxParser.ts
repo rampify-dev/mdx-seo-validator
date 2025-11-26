@@ -14,12 +14,23 @@ export function parseDocument(content: string): ParsedDocument {
   // Extract links
   const links = extractLinks(markdownContent);
 
+  // Extract meta tags
+  const canonical = extractCanonical(markdownContent);
+  const ogTags = extractOpenGraphTags(markdownContent);
+
   return {
     frontmatter,
     content: markdownContent,
     headings,
     images,
-    links
+    links,
+    metaTags: {
+      canonical,
+      ogTitle: ogTags.title,
+      ogDescription: ogTags.description,
+      ogImage: ogTags.image,
+      ogUrl: ogTags.url
+    }
   };
 }
 
@@ -94,4 +105,83 @@ function extractLinks(content: string): Link[] {
   });
 
   return links;
+}
+
+function extractCanonical(content: string): string | null {
+  // Look for <link rel="canonical" href="..." />
+  const canonicalRegex = /<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*\/?>/i;
+  const match = content.match(canonicalRegex);
+  if (match) {
+    return match[1];
+  }
+
+  // Also check reverse order: href before rel
+  const canonicalRegex2 = /<link[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["'][^>]*\/?>/i;
+  const match2 = content.match(canonicalRegex2);
+  if (match2) {
+    return match2[1];
+  }
+
+  return null;
+}
+
+function extractOpenGraphTags(content: string): {
+  title: string | null;
+  description: string | null;
+  image: string | null;
+  url: string | null;
+} {
+  const ogTags = {
+    title: null as string | null,
+    description: null as string | null,
+    image: null as string | null,
+    url: null as string | null
+  };
+
+  // Extract og:title
+  const titleMatch = content.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["'][^>]*\/?>/i);
+  if (titleMatch) {
+    ogTags.title = titleMatch[1];
+  } else {
+    // Check reverse order
+    const titleMatch2 = content.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:title["'][^>]*\/?>/i);
+    if (titleMatch2) {
+      ogTags.title = titleMatch2[1];
+    }
+  }
+
+  // Extract og:description
+  const descMatch = content.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["'][^>]*\/?>/i);
+  if (descMatch) {
+    ogTags.description = descMatch[1];
+  } else {
+    const descMatch2 = content.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:description["'][^>]*\/?>/i);
+    if (descMatch2) {
+      ogTags.description = descMatch2[1];
+    }
+  }
+
+  // Extract og:image
+  const imageMatch = content.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["'][^>]*\/?>/i);
+  if (imageMatch) {
+    ogTags.image = imageMatch[1];
+  } else {
+    const imageMatch2 = content.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["'][^>]*\/?>/i);
+    if (imageMatch2) {
+      ogTags.image = imageMatch2[1];
+    }
+  }
+
+  // Extract og:url
+  const urlMatch = content.match(/<meta[^>]*property=["']og:url["'][^>]*content=["']([^"']+)["'][^>]*\/?>/i);
+  if (urlMatch) {
+    ogTags.url = urlMatch[1];
+  } else {
+    const urlMatch2 = content.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:url["'][^>]*\/?>/i);
+    if (urlMatch2) {
+      ogTags.url = urlMatch2[1];
+    }
+  }
+
+  return ogTags;
 }

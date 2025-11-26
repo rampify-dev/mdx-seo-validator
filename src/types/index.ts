@@ -14,6 +14,13 @@ export interface ParsedDocument {
   headings: Heading[];
   images: Image[];
   links: Link[];
+  metaTags: {
+    canonical: string | null;
+    ogTitle: string | null;
+    ogDescription: string | null;
+    ogImage: string | null;
+    ogUrl: string | null;
+  };
 }
 
 export interface Heading {

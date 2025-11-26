@@ -25,7 +25,7 @@ export function validateSEO(
 
   // Build categories
   const categories: Category[] = [
-    buildMetaTagsCategory(frontmatter, title, description, faviconInfo),
+    buildMetaTagsCategory(frontmatter, title, description, faviconInfo, parsed.metaTags),
     buildContentCategory(headings, parsed.content),
     buildImagesCategory(images),
     buildLinksCategory(links)
@@ -66,7 +66,14 @@ function buildMetaTagsCategory(
   frontmatter: any,
   title: string,
   description: string,
-  faviconInfo?: { exists: boolean; dataUri?: string; type?: string }
+  faviconInfo?: { exists: boolean; dataUri?: string; type?: string },
+  metaTags?: {
+    canonical: string | null;
+    ogTitle: string | null;
+    ogDescription: string | null;
+    ogImage: string | null;
+    ogUrl: string | null;
+  }
 ): Category {
   const rules: Rule[] = [];
 
@@ -111,23 +118,56 @@ function buildMetaTagsCategory(
     canFix: true
   });
 
-  // Canonical URL
+  // Canonical URL - check both frontmatter and inline meta tags
+  const hasCanonicalFrontmatter = !!frontmatter.canonical;
+  const hasCanonicalMeta = !!metaTags?.canonical;
+  const hasCanonical = hasCanonicalFrontmatter || hasCanonicalMeta;
+
+  let canonicalMessage = 'Missing';
+  if (hasCanonicalFrontmatter && hasCanonicalMeta) {
+    canonicalMessage = 'Present (frontmatter + inline)';
+  } else if (hasCanonicalFrontmatter) {
+    canonicalMessage = 'Present (frontmatter)';
+  } else if (hasCanonicalMeta) {
+    canonicalMessage = 'Present (inline meta tag)';
+  }
+
   rules.push({
     id: 'canonical-url',
     name: 'Canonical URL',
-    status: frontmatter.canonical ? 'pass' : 'warning',
-    message: frontmatter.canonical ? 'Present' : 'Missing',
-    line: 5,
+    status: hasCanonical ? 'pass' : 'warning',
+    message: canonicalMessage,
+    line: hasCanonicalFrontmatter ? 5 : undefined,
     canFix: true
   });
 
-  // Open Graph tags
-  const hasOG = frontmatter.ogTitle && frontmatter.ogDescription && frontmatter.ogImage;
+  // Open Graph tags - check both frontmatter and inline meta tags
+  const hasOGFrontmatter = frontmatter.ogTitle && frontmatter.ogDescription && frontmatter.ogImage;
+  const hasOGMeta = metaTags?.ogTitle && metaTags?.ogDescription && metaTags?.ogImage;
+  const hasOG = hasOGFrontmatter || hasOGMeta;
+
+  // Count how many OG tags are present
+  const ogCount = [
+    frontmatter.ogTitle || metaTags?.ogTitle,
+    frontmatter.ogDescription || metaTags?.ogDescription,
+    frontmatter.ogImage || metaTags?.ogImage,
+    frontmatter.ogUrl || metaTags?.ogUrl
+  ].filter(Boolean).length;
+
+  let ogMessage = 'Missing some tags';
+  if (ogCount === 4) {
+    ogMessage = hasOGFrontmatter && hasOGMeta ? '4/4 present (frontmatter + inline)'
+              : hasOGFrontmatter ? '4/4 present (frontmatter)'
+              : '4/4 present (inline meta tags)';
+  } else if (ogCount > 0) {
+    ogMessage = `${ogCount}/4 present`;
+  }
+
   rules.push({
     id: 'og-tags',
     name: 'Open Graph Tags',
     status: hasOG ? 'pass' : 'warning',
-    message: hasOG ? '4/4 present' : 'Missing some tags',
+    message: ogMessage,
     canFix: true
   });
 
