@@ -26,12 +26,19 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 
     // Handle messages from the webview
     webviewView.webview.onDidReceiveMessage((data) => {
-      if (data.type === 'ready') {
-        // Webview is ready, send initial data
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-          this.validateDocument(editor.document);
-        }
+      switch (data.type) {
+        case 'ready':
+          // Webview is ready, send initial data
+          const editor = vscode.window.activeTextEditor;
+          if (editor) {
+            this.validateDocument(editor.document);
+          }
+          break;
+
+        case 'open-url':
+          // Open external URL
+          vscode.env.openExternal(vscode.Uri.parse(data.url));
+          break;
       }
     });
   }
@@ -262,6 +269,21 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
       color: var(--vscode-descriptionForeground);
       font-size: 11px;
     }
+    .footer {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--vscode-panel-border);
+      text-align: center;
+      font-size: 11px;
+      color: var(--vscode-descriptionForeground);
+    }
+    .footer a {
+      color: #0e639c;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -320,6 +342,11 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
   <div class="section">
     <h2>Validation Rules</h2>
     <div id="categories"></div>
+  </div>
+
+  <div class="footer">
+    Powered by <a href="https://rampify.dev" id="rampify-link">Rampify</a> •
+    <a href="https://github.com/rampify/mdx-seo-validator" id="github-link">Open Source</a>
   </div>
 
   <script>
@@ -423,6 +450,17 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
         }).join('');
       }
     }
+
+    // Handle footer link clicks
+    document.getElementById('rampify-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      vscode.postMessage({ type: 'open-url', url: 'https://rampify.dev' });
+    });
+
+    document.getElementById('github-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      vscode.postMessage({ type: 'open-url', url: 'https://github.com/rampify/mdx-seo-validator' });
+    });
 
     // Tell extension we're ready
     vscode.postMessage({ type: 'ready' });

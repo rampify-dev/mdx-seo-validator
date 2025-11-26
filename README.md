@@ -200,6 +200,31 @@ fix: correct title length calculation
 docs: update README examples
 ```
 
+## About Rampify
+
+This extension is built by [**Rampify**](https://rampify.dev), an SEO intelligence platform for developers.
+
+### Want More SEO Automation?
+
+While this extension validates individual MDX/Markdown files, Rampify offers **site-wide SEO automation**:
+
+- ✅ **Comprehensive Site Audits** - Crawl your entire site, detect 100+ SEO issues
+- ✅ **Google Search Console Integration** - Real-time indexing status, search analytics
+- ✅ **AI-Powered Insights** - Get actionable recommendations, not just raw data
+- ✅ **Schema.org Generation** - Auto-generate valid JSON-LD for any page type
+- ✅ **Content Strategy** - Discover keyword gaps, cannibalization issues
+- ✅ **MCP Integration** - Bring SEO intelligence directly into Claude Code, Cursor, Windsurf
+
+**Perfect for:**
+- Next.js, Astro, Remix developers
+- Technical founders building in public
+- Developer agencies managing client sites
+- Teams using AI coding tools (Cursor, Claude Code)
+
+[**Try Rampify Free →**](https://rampify.dev)
+
+---
+
 ## Roadmap
 
 - [ ] Schema.org JSON-LD validation
