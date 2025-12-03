@@ -68,6 +68,9 @@ The entire webview is defined in `src/providers/WebviewProvider.ts` with inline 
 
 **HTML Validator** (`src/utils/htmlValidator.ts`)
 - Fetches rendered HTML from dev server (configurable via `seo.devServerUrl`)
+- **Auto-detects URL patterns**:
+  - Page files (`page.mdx`, `page.tsx`): Uses file-system routing
+  - Content files: Uses `contentPath` + `urlPattern` configuration
 - Uses cheerio to extract actual meta tags (what Google sees)
 - Validates Open Graph tags, Twitter Cards, Schema.org JSON-LD
 - Only runs when `seo.devServerUrl` is configured

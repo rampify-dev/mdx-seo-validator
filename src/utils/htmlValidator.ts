@@ -132,19 +132,67 @@ export function buildUrlFromPath(
   contentPath: string,
   urlPattern: string
 ): string | null {
-  // Extract slug from file path
-  // e.g., /Users/x/project/content/blog/my-post.mdx → my-post
   const pathParts = filePath.split('/');
   const fileName = pathParts[pathParts.length - 1];
-  const slug = fileName.replace(/\.(mdx|md)$/, '');
 
-  // Find content directory index
+  // CASE 1: File-system routing (page.mdx, page.tsx, or Astro/Remix pages)
+  // Examples:
+  //   app/docs/context-driven-development/page.mdx → /docs/context-driven-development
+  //   app/blog/page.mdx → /blog
+  //   src/pages/about.mdx → /about (Astro)
+  if (isPageFile(fileName)) {
+    return buildPageFileUrl(pathParts, fileName, devServerUrl);
+  }
+
+  // CASE 2: Content files with slug-based routing
+  // Example: content/blog/my-post.mdx + pattern "/blog/{slug}" → /blog/my-post
+  const slug = fileName.replace(/\.(mdx|md)$/, '');
   const contentIndex = pathParts.indexOf(contentPath);
+
   if (contentIndex === -1) {
     return null;
   }
 
-  // Build URL from pattern
   const url = urlPattern.replace('{slug}', slug);
   return `${devServerUrl}${url}`;
+}
+
+/**
+ * Check if file is a page file (Next.js, Astro, Remix)
+ */
+function isPageFile(fileName: string): boolean {
+  return fileName === 'page.mdx' ||
+         fileName === 'page.tsx' ||
+         fileName === 'page.jsx' ||
+         fileName.match(/^\[.*\]\.mdx$/) !== null; // Astro/Remix dynamic routes
+}
+
+/**
+ * Build URL for page files based on file-system routing
+ */
+function buildPageFileUrl(pathParts: string[], fileName: string, devServerUrl: string): string {
+  // Find the app/src directory (framework root)
+  const appIndex = pathParts.findIndex(part => part === 'app' || part === 'src');
+
+  if (appIndex === -1) {
+    return devServerUrl;
+  }
+
+  // Extract route parts after app/src
+  const routeParts = pathParts.slice(appIndex + 1);
+
+  // Remove page.mdx/page.tsx from the end
+  if (fileName.startsWith('page.')) {
+    routeParts.pop();
+  }
+
+  // Remove 'pages' directory if it exists (Astro/Remix)
+  if (routeParts[0] === 'pages') {
+    routeParts.shift();
+  }
+
+  // Build URL path
+  const urlPath = routeParts.length > 0 ? '/' + routeParts.join('/') : '/';
+
+  return `${devServerUrl}${urlPath}`;
 }

@@ -106,10 +106,30 @@ The `{slug}` placeholder will be replaced with the MDX filename (without extensi
 - Fast, real-time, no server required
 
 ### 2. Rendered HTML Validation (Optional - Requires Dev Server)
-- Extension builds URL from your file path + configuration
+- Extension builds URL from your file path automatically
+- **Auto-detects page files** (`page.mdx`, `page.tsx`) using file-system routing
+- **Auto-detects content files** using `contentPath` and `urlPattern` settings
 - Fetches rendered HTML from dev server
 - Extracts actual meta tags using cheerio (same as Rampify)
 - Shows what Google actually sees
+
+### URL Building Logic
+
+The extension automatically detects two patterns:
+
+**Pattern 1: Page Files (File-System Routing)**
+```
+app/docs/context-driven-development/page.mdx → /docs/context-driven-development
+app/blog/page.mdx → /blog
+src/pages/about.mdx → /about (Astro)
+```
+No configuration needed - works automatically!
+
+**Pattern 2: Content Files (Slug-Based Routing)**
+```
+content/blog/my-post.mdx + urlPattern "/blog/{slug}" → /blog/my-post
+```
+Uses `contentPath` and `urlPattern` settings.
 
 ### Benefits of Rendered HTML Validation
 
