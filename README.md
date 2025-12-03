@@ -15,11 +15,11 @@ Get real-time feedback on title tags, meta descriptions, Open Graph tags, headin
 **The Problem:** Traditional SEO checkers require pasting content into external tools. This breaks your flow and slows down development.
 
 **The Solution:** MDX SEO Validator brings real-time SEO validation directly into VS Code:
-- ✅ **Live Google search preview** as you type (no external tools)
-- ✅ **Validate meta tags** instantly (title, description, OG tags)
-- ✅ **Check SEO scores** for every page (0-100 rating)
-- ✅ **Real-time feedback** with actionable recommendations
-- ✅ **Framework-aware** for Next.js, Astro, and Remix
+- **Live Google search preview** as you type (no external tools)
+- **Validate meta tags** instantly (title, description, OG tags)
+- **Check SEO scores** for every page (0-100 rating)
+- **Real-time feedback** with actionable recommendations
+- **Framework-aware** for Next.js, Astro, and Remix
 
 Perfect for developers building blogs, documentation sites, and content-driven applications who want **professional SEO validation without context switching**.
 
@@ -182,21 +182,21 @@ No need for external SEO checkers — validate everything in VS Code.
 ## Validation Rules
 
 ### Meta Tags (30% of score)
-- ✅ **Favicon**: Detected from project structure
-- ✅ **Title Length**: 30-60 characters (50-60 optimal)
-- ✅ **Meta Description**: 150-160 characters (optimal)
-- ⚠️ **Canonical URL**: Recommended for duplicate content
-- ⚠️ **Open Graph Tags**: Required for social sharing
+- **Favicon**: Detected from project structure
+- **Title Length**: 30-60 characters (50-60 optimal)
+- **Meta Description**: 150-160 characters (optimal)
+- **Canonical URL**: Recommended for duplicate content
+- **Open Graph Tags**: Required for social sharing
 
 ### Content Structure (25% of score)
-- ✅ **Heading Hierarchy**: One H1 per page
-- ✅ **Word Count**: 1500+ words for blog posts (1000+ minimum)
+- **Heading Hierarchy**: One H1 per page
+- **Word Count**: 1500+ words for blog posts (1000+ minimum)
 
 ### Images (10% of score)
-- ✅ **Alt Text**: All images must have descriptive alt text
+- **Alt Text**: All images must have descriptive alt text
 
 ### Links (10% of score)
-- ⚠️ **Internal Links**: 3+ recommended for better site structure
+- **Internal Links**: 3+ recommended for better site structure
 
 ## Configuration
 
@@ -289,21 +289,16 @@ docs: update README examples
 
 ## How This Compares to Other SEO Tools
 
-### Traditional SEO Checkers
-- ❌ Require copying/pasting into external websites
-- ❌ Break your development workflow
-- ❌ Generic recommendations (not developer-focused)
-- ❌ No IDE integration
-- ❌ Can't validate meta tags in real-time
-
-### MDX SEO Validator Extension
-- ✅ **VS Code integration** - Validate SEO without leaving your editor
-- ✅ **Real-time validation** - See issues as you type
-- ✅ **Built for developers** - MDX/Markdown workflow optimization
-- ✅ **Framework-aware** - Next.js, Astro, Remix support
-- ✅ **Live Google preview** - See search results in real-time
-- ✅ **Meta tag validator** - Title, description, OG tags, schema.org
-- ✅ **Free and open source** - MIT licensed
+| Feature | Traditional SEO Checkers | MDX SEO Validator |
+|---------|-------------------------|-------------------|
+| **IDE Integration** | None - external websites only | Native VS Code extension |
+| **Real-Time Validation** | Manual copy/paste required | Live feedback as you type |
+| **Workflow** | Context switching required | Stay in your editor |
+| **Target Audience** | General content creators | Developers and technical writers |
+| **Framework Support** | Generic | Next.js, Astro, Remix aware |
+| **Google Preview** | Static or none | Live preview with character counts |
+| **Meta Tag Validation** | Basic checks | Comprehensive (title, description, OG, schema) |
+| **Price** | Often subscription-based | Free and open source (MIT) |
 
 **The result:** Professional SEO validation without context switching. Ship SEO-optimized content faster.
 
@@ -315,11 +310,11 @@ This extension is built by [**Rampify**](https://rampify.dev), the SEO intellige
 
 While this extension validates individual MDX/Markdown files, Rampify offers **site-wide SEO automation**:
 
-- ✅ **Comprehensive Site Audits** - Crawl your entire site, detect 100+ SEO issues
-- ✅ **Google Search Console Integration** - Real-time indexing status, search analytics
-- ✅ **Schema.org Generation** - Auto-generate valid JSON-LD for any page type
-- ✅ **Content Strategy** - Discover keyword gaps, cannibalization issues
-- ✅ **MCP Integration** - Bring SEO intelligence directly into Claude Code, Cursor, Windsurf
+- **Comprehensive Site Audits** - Crawl your entire site, detect 100+ SEO issues
+- **Google Search Console Integration** - Real-time indexing status, search analytics
+- **Schema.org Generation** - Auto-generate valid JSON-LD for any page type
+- **Content Strategy** - Discover keyword gaps, cannibalization issues
+- **MCP Integration** - Bring SEO intelligence directly into Claude Code, Cursor, Windsurf
 
 **Perfect for:**
 - Next.js, Astro, Remix developers
@@ -353,4 +348,4 @@ Built with:
 
 ---
 
-**Made with ❤️ by the [Rampify](https://rampify.dev) team**
+**Made by the [Rampify](https://rampify.dev) team**
