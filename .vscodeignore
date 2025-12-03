@@ -1,0 +1,48 @@
+# Source files (we ship dist/ instead)
+src/**
+tsconfig.json
+
+# Development files
+.vscode/**
+.vscode-test/**
+*.log
+
+# Git files
+.git/**
+.gitignore
+
+# GitHub files
+.github/**
+
+# Build artifacts
+*.vsix
+
+# Documentation (keep README, LICENSE, CHANGELOG only)
+CLAUDE.md
+CONFIGURATION.md
+MARKETPLACE_CHECKLIST.md
+SEO_OPTIMIZATION.md
+CONTRIBUTING.md
+
+# Test files
+test.mdx
+**/*.test.ts
+**/*.spec.ts
+
+# Node modules (required dependencies will be bundled by esbuild)
+node_modules/**
+
+# Build configs
+.npmignore
+.eslintrc.js
+.prettierrc
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Misc
+**/*.map
