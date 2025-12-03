@@ -18,6 +18,8 @@ node_modules/
 
 # Documentation (keep README, LICENSE, CHANGELOG)
 # Everything else is excluded by default
+CLAUDE.md
+CONFIGURATION.md
 
 # OS files
 .DS_Store

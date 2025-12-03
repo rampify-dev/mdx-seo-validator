@@ -1,7 +1,7 @@
 {
   "name": "mdx-seo-validator",
   "displayName": "MDX SEO Validator",
-  "description": "Real-time SEO validation for MDX/Markdown files with live Google search preview",
+  "description": "SEO intelligence for developers - Real-time SEO validation for MDX/Markdown with live Google search preview in VS Code. Built for Next.js, Astro, Remix developers.",
   "version": "0.1.0",
   "publisher": "rampify",
   "engines": {
@@ -13,11 +13,23 @@
   ],
   "keywords": [
     "seo",
+    "seo-tools",
+    "developer-seo",
+    "seo-intelligence",
     "mdx",
     "markdown",
+    "nextjs",
+    "astro",
     "validation",
-    "meta tags",
-    "schema.org"
+    "meta-tags",
+    "schema.org",
+    "content-seo",
+    "technical-seo",
+    "ide-seo",
+    "real-time-seo",
+    "google-preview",
+    "open-graph",
+    "seo-automation"
   ],
   "activationEvents": [
     "onLanguage:mdx",
@@ -57,16 +69,25 @@
     "configuration": {
       "title": "MDX SEO Validator",
       "properties": {
-        "seo.framework": {
-          "type": "string",
-          "default": "auto",
-          "enum": ["auto", "nextjs-app", "nextjs-pages", "astro", "remix", "generic"],
-          "description": "Framework detection mode"
-        },
         "seo.siteDomain": {
           "type": "string",
           "default": "example.com",
           "description": "Your site domain (for URL preview)"
+        },
+        "seo.devServerUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Your local dev server URL (e.g., http://localhost:3000) - for validating rendered HTML"
+        },
+        "seo.contentPath": {
+          "type": "string",
+          "default": "content",
+          "description": "Path to your content directory (e.g., 'content', 'src/content')"
+        },
+        "seo.urlPattern": {
+          "type": "string",
+          "default": "/blog/{slug}",
+          "description": "URL pattern for content pages (e.g., '/blog/{slug}', '/docs/{slug}')"
         }
       }
     }
@@ -94,7 +115,9 @@
     "unified": "^11.0.4",
     "remark-parse": "^11.0.0",
     "remark-mdx": "^3.0.0",
-    "remark-frontmatter": "^5.0.0"
+    "remark-frontmatter": "^5.0.0",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12"
   },
   "license": "MIT",
   "repository": {

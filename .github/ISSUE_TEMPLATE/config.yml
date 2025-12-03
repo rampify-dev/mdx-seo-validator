@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or Discussion
+    url: https://github.com/rampify-dev/mdx-seo-validator/discussions
+    about: Ask questions or start a discussion (once Discussions are enabled)
+  - name: Rampify Platform
+    url: https://rampify.dev
+    about: Learn more about Rampify's SEO intelligence platform

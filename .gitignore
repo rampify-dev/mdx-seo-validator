@@ -6,3 +6,6 @@ dist/
 *.log
 webview/node_modules/
 webview/dist/
+
+# Internal strategy docs
+SEO_OPTIMIZATION.md

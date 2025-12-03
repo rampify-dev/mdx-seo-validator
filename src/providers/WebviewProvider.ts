@@ -2,8 +2,7 @@ import * as vscode from 'vscode';
 import { parseDocument } from '../parsers/mdxParser';
 import { validateSEO } from '../validators/seoValidator';
 import { detectFavicon, getFaviconDataUri } from '../utils/faviconDetector';
-import { detectFramework, findMetadataFiles } from '../utils/frameworkDetector';
-import { parseNextJsMetadata, validateMetadata, type ExtractedMetadata } from '../utils/metadataParser';
+import { validateRenderedHtml, buildUrlFromPath } from '../utils/htmlValidator';
 
 export class SEOWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'seoPreview';
@@ -87,57 +86,50 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
       }
     }
 
-    // Detect framework and parse metadata files
-    let frameworkMetadata;
-    if (workspaceFolder) {
-      const framework = await detectFramework(workspaceFolder);
-      console.log('[SEO Validator] Framework detected:', framework.type);
+    // Validate rendered HTML if dev server is configured
+    let renderedHtml;
+    const config = vscode.workspace.getConfiguration('seo');
+    const devServerUrl = config.get<string>('devServerUrl');
 
-      if (framework.type !== 'unknown') {
-        const metadataFiles = findMetadataFiles(document.uri.fsPath, framework.type);
-        console.log('[SEO Validator] Metadata files found:', metadataFiles);
+    if (devServerUrl && devServerUrl.trim()) {
+      const contentPath = config.get<string>('contentPath') || 'content';
+      const urlPattern = config.get<string>('urlPattern') || '/blog/{slug}';
 
-        if (metadataFiles.length > 0) {
-          // Parse the first metadata file found (usually page.tsx or layout.tsx)
-          const extractedMetadata = parseNextJsMetadata(metadataFiles[0]);
-          console.log('[SEO Validator] Extracted metadata:', extractedMetadata);
+      const pageUrl = buildUrlFromPath(
+        document.uri.fsPath,
+        devServerUrl.replace(/\/$/, ''), // Remove trailing slash
+        contentPath,
+        urlPattern
+      );
 
-          if (extractedMetadata) {
-            const validation = validateMetadata(extractedMetadata);
+      if (pageUrl) {
+        console.log('[SEO Validator] Fetching rendered HTML from:', pageUrl);
+        const result = await validateRenderedHtml(pageUrl);
 
-            frameworkMetadata = {
-              framework: framework.type,
-              hasMetadata: extractedMetadata.source !== 'none',
-              fileName: extractedMetadata.fileName,
-              source: extractedMetadata.source,
-              fields: {
-                title: extractedMetadata.hasTitle,
-                description: extractedMetadata.hasDescription,
-                canonical: extractedMetadata.hasCanonical,
-                openGraph: extractedMetadata.hasOpenGraph
-              },
-              score: validation.score,
-              issues: validation.issues,
-              suggestions: validation.suggestions
-            };
-
-            console.log('[SEO Validator] Framework metadata:', frameworkMetadata);
-          }
+        if (result.success && result.metadata) {
+          renderedHtml = {
+            url: pageUrl,
+            metadata: result.metadata
+          };
+          console.log('[SEO Validator] Rendered HTML metadata:', result.metadata);
         } else {
-          console.log('[SEO Validator] No metadata files found for:', document.uri.fsPath);
+          console.log('[SEO Validator] Failed to fetch rendered HTML:', result.error);
+          renderedHtml = {
+            url: pageUrl,
+            error: result.error
+          };
         }
-      } else {
-        console.log('[SEO Validator] Unknown framework - no metadata detection');
       }
     }
 
     // Validate SEO
-    const validation = validateSEO(parsed, faviconInfo, frameworkMetadata);
+    const validation = validateSEO(parsed, faviconInfo);
 
     // Send to webview
     this._view.webview.postMessage({
       type: 'validation-update',
-      data: validation
+      data: validation,
+      renderedHtml
     });
   }
 
@@ -424,9 +416,9 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
     </div>
   </div>
 
-  <div class="section" id="framework-section" style="display: none;">
-    <h2>Framework Metadata</h2>
-    <div id="framework-content"></div>
+  <div class="section" id="rendered-html-section" style="display: none;">
+    <h2>🌐 Rendered HTML Validation</h2>
+    <div id="rendered-html-content"></div>
   </div>
 
   <div class="section">
@@ -555,73 +547,91 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
         }).join('');
       }
 
-      // Update framework metadata section
-      if (data.frameworkMetadata && data.frameworkMetadata.hasMetadata) {
-        const fm = data.frameworkMetadata;
-        document.getElementById('framework-section').style.display = 'block';
+      // Update rendered HTML section
+      if (message.renderedHtml) {
+        const rh = message.renderedHtml;
+        document.getElementById('rendered-html-section').style.display = 'block';
 
-        const frameworkName = {
-          'nextjs-app': 'Next.js App Router',
-          'nextjs-pages': 'Next.js Pages Router',
-          'astro': 'Astro',
-          'remix': 'Remix'
-        }[fm.framework] || fm.framework;
+        let html = '';
 
-        let html = \`
-          <div style="margin-bottom: 12px; font-size: 12px; color: var(--vscode-descriptionForeground);">
-            <strong>\${frameworkName}</strong> • \${fm.fileName}
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-            <span style="font-size: 11px; color: var(--vscode-descriptionForeground);">Type:</span>
-            <span style="font-size: 12px; padding: 2px 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
-              \${fm.source === 'generateMetadata' ? 'generateMetadata()' : 'static metadata'}
-            </span>
-          </div>
-        \`;
-
-        // Show fields detected
-        html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 12px;">';
-
-        const fields = [
-          { name: 'Title', value: fm.fields.title },
-          { name: 'Description', value: fm.fields.description },
-          { name: 'Canonical', value: fm.fields.canonical },
-          { name: 'Open Graph', value: fm.fields.openGraph }
-        ];
-
-        fields.forEach(field => {
-          const icon = field.value ? '✓' : '✗';
-          const color = field.value ? '#4ec9b0' : '#f48771';
-          html += \`
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="color: \${color}; font-weight: bold;">\${icon}</span>
-              <span>\${field.name}</span>
+        if (rh.error) {
+          // Show error state
+          html = \`
+            <div style="padding: 12px; background: rgba(244, 135, 113, 0.1); border-left: 3px solid #f48771; border-radius: 4px; font-size: 12px;">
+              <div style="font-weight: 500; margin-bottom: 6px;">Failed to fetch rendered HTML</div>
+              <div style="color: var(--vscode-descriptionForeground);">\${rh.error}</div>
+              <div style="margin-top: 8px; font-size: 11px; color: var(--vscode-descriptionForeground);">
+                💡 Make sure your dev server is running at: <code style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 2px;">\${rh.url}</code>
+              </div>
             </div>
           \`;
-        });
+        } else if (rh.metadata) {
+          const m = rh.metadata;
 
-        html += '</div>';
+          // Show URL
+          html += \`
+            <div style="margin-bottom: 12px; font-size: 11px; color: var(--vscode-descriptionForeground);">
+              Fetched from: <a href="\${rh.url}" style="color: var(--vscode-textLink-foreground);">\${rh.url}</a>
+            </div>
+          \`;
 
-        // Show issues and suggestions
-        if (fm.issues && fm.issues.length > 0) {
-          html += '<div style="margin-top: 12px; padding: 8px; background: rgba(244, 135, 113, 0.1); border-left: 3px solid #f48771; font-size: 11px;">';
-          fm.issues.forEach(issue => {
-            html += \`<div style="margin-bottom: 4px;">• \${issue}</div>\`;
+          // Meta Tags Grid
+          html += '<div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 16px; font-size: 12px;">';
+
+          const metaFields = [
+            { label: 'Title', value: m.title },
+            { label: 'Description', value: m.description },
+            { label: 'Canonical', value: m.canonical },
+            { label: 'OG Title', value: m.ogTitle },
+            { label: 'OG Description', value: m.ogDescription },
+            { label: 'OG Image', value: m.ogImage },
+            { label: 'OG Type', value: m.ogType },
+            { label: 'Twitter Card', value: m.twitterCard },
+            { label: 'H1', value: m.h1Text }
+          ];
+
+          metaFields.forEach(field => {
+            const icon = field.value ? '✓' : '✗';
+            const color = field.value ? '#4ec9b0' : '#f48771';
+            const displayValue = field.value
+              ? (field.value.length > 60 ? field.value.slice(0, 57) + '...' : field.value)
+              : 'Missing';
+
+            html += \`
+              <div style="display: flex; align-items: flex-start; gap: 8px; padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px;">
+                <span style="color: \${color}; font-weight: bold; flex-shrink: 0; margin-top: 2px;">\${icon}</span>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 500; margin-bottom: 2px;">\${field.label}</div>
+                  <div style="color: var(--vscode-descriptionForeground); word-wrap: break-word; font-size: 11px;">\${displayValue}</div>
+                </div>
+              </div>
+            \`;
           });
+
           html += '</div>';
+
+          // Schema.org
+          if (m.schemaOrg.count > 0) {
+            html += \`
+              <div style="padding: 8px; background: rgba(78, 201, 176, 0.1); border-left: 3px solid #4ec9b0; border-radius: 4px; font-size: 11px;">
+                <div style="font-weight: 500; margin-bottom: 4px;">✓ Schema.org JSON-LD detected</div>
+                <div style="color: var(--vscode-descriptionForeground);">
+                  Types: \${m.schemaOrg.types.join(', ')} (\${m.schemaOrg.count} schema\${m.schemaOrg.count > 1 ? 's' : ''})
+                </div>
+              </div>
+            \`;
+          } else {
+            html += \`
+              <div style="padding: 8px; background: rgba(244, 135, 113, 0.1); border-left: 3px solid #f48771; border-radius: 4px; font-size: 11px;">
+                <div style="font-weight: 500;">✗ No Schema.org JSON-LD found</div>
+              </div>
+            \`;
+          }
         }
 
-        if (fm.suggestions && fm.suggestions.length > 0) {
-          html += '<div style="margin-top: 8px; padding: 8px; background: rgba(206, 145, 120, 0.1); border-left: 3px solid #ce9178; font-size: 11px;">';
-          fm.suggestions.forEach(suggestion => {
-            html += \`<div style="margin-bottom: 4px;">💡 \${suggestion}</div>\`;
-          });
-          html += '</div>';
-        }
-
-        document.getElementById('framework-content').innerHTML = html;
+        document.getElementById('rendered-html-content').innerHTML = html;
       } else {
-        document.getElementById('framework-section').style.display = 'none';
+        document.getElementById('rendered-html-section').style.display = 'none';
       }
     }
 

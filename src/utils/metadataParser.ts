@@ -29,8 +29,19 @@ export interface ExtractedMetadata {
   // References to frontmatter fields (for validation)
   usesFrontmatterFields: string[];
 
+  // Field dependencies with fallback detection
+  fieldDependencies: FieldDependency[];
+
   // Raw extracted code (for debugging)
   rawCode?: string;
+}
+
+export interface FieldDependency {
+  field: string; // e.g., "title", "ogImage", "description"
+  path: string; // e.g., "post.title", "frontmatter.ogImage"
+  hasFallback: boolean;
+  fallbackValue?: string; // e.g., "'/default-og.png'", "generateOGImage(post.title)"
+  isRequired: boolean; // true if no fallback
 }
 
 /**
@@ -76,7 +87,8 @@ export function parseNextJsMetadata(filePath: string): ExtractedMetadata | null 
       images: false,
       url: false
     },
-    usesFrontmatterFields: []
+    usesFrontmatterFields: [],
+    fieldDependencies: []
   };
 }
 
@@ -96,8 +108,12 @@ function parseGenerateMetadataFunction(functionBody: string, filePath: string, f
       url: false
     },
     usesFrontmatterFields: [],
+    fieldDependencies: [],
     rawCode: functionBody
   };
+
+  // Extract field dependencies with fallback detection
+  result.fieldDependencies = extractFieldDependencies(functionBody);
 
   // Extract the return object
   const returnMatch = functionBody.match(/return\s+({[\s\S]*})/);
@@ -166,6 +182,7 @@ function parseStaticMetadata(metadataObject: string, filePath: string, fileName:
       url: false
     },
     usesFrontmatterFields: [],
+    fieldDependencies: extractFieldDependencies(metadataObject),
     rawCode: metadataObject
   };
 
@@ -236,6 +253,71 @@ function extractFrontmatterRefs(code: string, field: string, refs: string[]): vo
       }
     }
   }
+}
+
+/**
+ * Extract field dependencies from metadata code with fallback detection
+ */
+function extractFieldDependencies(code: string): FieldDependency[] {
+  const dependencies: FieldDependency[] = [];
+  const seen = new Set<string>();
+
+  // Patterns to detect field references with fallbacks
+  const patterns = [
+    // Nullish coalescing: post.ogImage ?? '/default.png'
+    /(?:post|frontmatter|data)\.([a-zA-Z_][a-zA-Z0-9_]*)\s*\?\?\s*([^,}\n]+)/g,
+
+    // Logical OR: post.ogImage || '/default.png'
+    /(?:post|frontmatter|data)\.([a-zA-Z_][a-zA-Z0-9_]*)\s*\|\|\s*([^,}\n]+)/g,
+
+    // Ternary: post.ogImage ? post.ogImage : '/default.png'
+    /(?:post|frontmatter|data)\.([a-zA-Z_][a-zA-Z0-9_]*)\s*\?\s*(?:post|frontmatter|data)\.\1\s*:\s*([^,}\n]+)/g,
+
+    // Simple reference: post.title (no fallback)
+    /(?:post|frontmatter|data)\.([a-zA-Z_][a-zA-Z0-9_]*)(?!\s*(\?\?|\|\||\?))/g
+  ];
+
+  // First pass: detect references with fallbacks
+  for (let i = 0; i < 3; i++) {
+    const pattern = patterns[i];
+    const matches = code.matchAll(pattern);
+
+    for (const match of matches) {
+      const field = match[1];
+      const fallback = match[2]?.trim();
+
+      if (field && !seen.has(field)) {
+        seen.add(field);
+        dependencies.push({
+          field,
+          path: `post.${field}`,
+          hasFallback: true,
+          fallbackValue: fallback,
+          isRequired: false
+        });
+      }
+    }
+  }
+
+  // Second pass: detect references without fallbacks
+  const simplePattern = patterns[3];
+  const simpleMatches = code.matchAll(simplePattern);
+
+  for (const match of simpleMatches) {
+    const field = match[1];
+
+    if (field && !seen.has(field)) {
+      seen.add(field);
+      dependencies.push({
+        field,
+        path: `post.${field}`,
+        hasFallback: false,
+        isRequired: true
+      });
+    }
+  }
+
+  return dependencies;
 }
 
 /**

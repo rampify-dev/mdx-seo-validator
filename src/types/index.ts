@@ -66,21 +66,6 @@ export interface ValidationData {
   };
   score: number;
   categories: Category[];
-  frameworkMetadata?: {
-    framework: string;
-    hasMetadata: boolean;
-    fileName?: string;
-    source?: 'generateMetadata' | 'static' | 'none';
-    fields: {
-      title: boolean;
-      description: boolean;
-      canonical: boolean;
-      openGraph: boolean;
-    };
-    score?: number;
-    issues?: string[];
-    suggestions?: string[];
-  };
 }
 
 export interface Category {

@@ -1,12 +1,44 @@
 # MDX SEO Validator
 
-> Real-time SEO validation for MDX/Markdown files with live Google search preview
+> **SEO intelligence in your IDE** — Real-time SEO validation for MDX/Markdown files with live Google search preview
 
-A VS Code extension that helps you write SEO-optimized content by showing exactly how your page will appear in Google search results, with real-time validation and actionable feedback.
+A VS Code extension that brings **SEO intelligence directly into your development workflow**. Write SEO-optimized content for Next.js, Astro, Remix, and any MDX/Markdown-based site with real-time feedback as you type. See exactly how your page will appear in Google search results without leaving your editor.
 
 ![VS Code Extension](https://img.shields.io/badge/VS%20Code-Extension-blue?logo=visual-studio-code)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)
+
+## Why SEO Intelligence in Your IDE?
+
+**Traditional SEO tools require context switching.** You write content in your IDE, then paste it into external tools to check SEO. This breaks your flow and slows you down.
+
+**MDX SEO Validator brings SEO intelligence directly into VS Code:**
+- See Google search preview as you type (no context switching)
+- Catch SEO issues before committing code
+- Real-time validation with actionable feedback
+- Developer-friendly workflow (no external tools needed)
+
+Perfect for developers building content-heavy sites who want **professional SEO without leaving their IDE**.
+
+## Who This Is For
+
+### Content-Focused Developers
+- Building blogs with Next.js, Astro, or Remix
+- Writing documentation sites with MDX
+- Managing technical content at scale
+- Want SEO best practices built into their workflow
+
+### Technical Founders
+- Building in public and need strong SEO
+- Writing blog content to drive organic traffic
+- Don't have time for external SEO tools
+- Want instant feedback while writing
+
+### Developer Agencies
+- Building client sites with MDX/Markdown
+- Need consistent SEO quality across projects
+- Want to catch issues during development
+- Deliver SEO-optimized content from day one
 
 ## Features
 
@@ -91,6 +123,55 @@ Once published, install directly from the VS Code Marketplace.
 5. **Review validation rules**
    - See exactly which SEO checks are passing or failing
    - Get specific feedback for each issue
+
+## Common Use Cases
+
+### Use Case 1: Writing a Blog Post for Next.js
+**Scenario:** You're writing a technical blog post and want to ensure it's SEO-optimized before publishing.
+
+```mdx
+---
+title: "How to Optimize React Server Components for SEO"
+description: "Learn how to optimize React Server Components for search engines with meta tags, dynamic metadata, and SEO best practices for Next.js 14."
+---
+
+# How to Optimize React Server Components for SEO
+
+Your content here...
+```
+
+**What the extension does:**
+- Shows live Google preview as you type the title/description
+- Validates title is 50-60 characters (optimal)
+- Checks description is 150-160 characters
+- Verifies H1 matches title
+- Ensures images have alt text
+
+### Use Case 2: Documentation Site with Astro
+**Scenario:** Building docs and want consistent SEO across all pages.
+
+```mdx
+---
+title: "API Reference: Authentication"
+description: "Complete API reference for authentication endpoints, including OAuth, JWT tokens, and session management."
+---
+
+The extension validates:
+- Title length for search engines
+- Meta description optimization
+- Proper heading hierarchy
+- Internal link structure
+```
+
+### Use Case 3: Content Marketing for SaaS
+**Scenario:** Writing SEO-focused content to drive organic traffic.
+
+The extension helps you:
+- Optimize titles for click-through rate
+- Write compelling meta descriptions
+- Validate Open Graph tags for social sharing
+- Ensure proper content structure (H1, H2, word count)
+- Preview exactly how your page appears in Google
 
 ## Validation Rules
 
@@ -200,9 +281,27 @@ fix: correct title length calculation
 docs: update README examples
 ```
 
+## How This Compares
+
+### Traditional SEO Tools
+- ❌ Require pasting content into external tools
+- ❌ Break your development workflow
+- ❌ Show generic recommendations
+- ❌ No integration with your IDE or framework
+
+### MDX SEO Validator
+- ✅ **SEO intelligence in your IDE** - Never leave VS Code
+- ✅ **Real-time feedback** - See issues as you type
+- ✅ **Developer-focused** - Built for MDX/Markdown workflows
+- ✅ **Framework-aware** - Understands Next.js, Astro, Remix
+- ✅ **Live Google preview** - See exactly what users see
+- ✅ **Free and open source** - MIT licensed
+
+**The result:** Professional SEO without context switching. Write better content faster.
+
 ## About Rampify
 
-This extension is built by [**Rampify**](https://rampify.dev), an SEO intelligence platform for developers.
+This extension is built by [**Rampify**](https://rampify.dev), the SEO intelligence platform for developers.
 
 ### Want More SEO Automation?
 

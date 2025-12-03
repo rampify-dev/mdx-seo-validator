@@ -3,8 +3,7 @@ import type { ParsedDocument, ValidationData, Category, Rule } from '../types';
 
 export function validateSEO(
   parsed: ParsedDocument,
-  faviconInfo?: { exists: boolean; dataUri?: string; type?: string },
-  frameworkMetadata?: any
+  faviconInfo?: { exists: boolean; dataUri?: string; type?: string }
 ): ValidationData {
   const { frontmatter, headings, images, links } = parsed;
 
@@ -26,7 +25,7 @@ export function validateSEO(
 
   // Build categories
   const categories: Category[] = [
-    buildMetaTagsCategory(frontmatter, title, description, faviconInfo, parsed.metaTags, frameworkMetadata),
+    buildMetaTagsCategory(frontmatter, title, description, faviconInfo, parsed.metaTags),
     buildContentCategory(headings, parsed.content),
     buildImagesCategory(images),
     buildLinksCategory(links)
@@ -59,8 +58,7 @@ export function validateSEO(
     },
     favicon: faviconInfo,
     score,
-    categories,
-    frameworkMetadata
+    categories
   };
 }
 
@@ -75,8 +73,7 @@ function buildMetaTagsCategory(
     ogDescription: string | null;
     ogImage: string | null;
     ogUrl: string | null;
-  },
-  frameworkMetadata?: any
+  }
 ): Category {
   const rules: Rule[] = [];
 
@@ -121,33 +118,50 @@ function buildMetaTagsCategory(
     canFix: true
   });
 
-  // Canonical URL - framework metadata takes precedence
-  let hasCanonical = false;
+  // Publication date
+  const hasDate = !!(frontmatter.date || frontmatter.publishedAt || frontmatter.published_date);
+  const dateValue = frontmatter.date || frontmatter.publishedAt || frontmatter.published_date;
+
+  rules.push({
+    id: 'publication-date',
+    name: 'Publication Date',
+    status: hasDate ? 'pass' : 'warning',
+    message: hasDate
+      ? `Present (${dateValue})`
+      : 'Missing (recommended for SEO)',
+    canFix: true
+  });
+
+  // Featured image
+  const hasImage = !!(frontmatter.image || frontmatter.ogImage || frontmatter.cover);
+  const imageValue = frontmatter.image || frontmatter.ogImage || frontmatter.cover;
+
+  rules.push({
+    id: 'featured-image',
+    name: 'Featured Image',
+    status: hasImage ? 'pass' : 'warning',
+    message: hasImage
+      ? `Present (${typeof imageValue === 'string' ? imageValue.split('/').pop() : 'set'})`
+      : 'Missing (recommended for social sharing)',
+    canFix: true
+  });
+
+  // Canonical URL
+  const hasCanonicalFrontmatter = !!frontmatter.canonical;
+  const hasCanonicalMeta = !!metaTags?.canonical;
+  const hasCanonical = hasCanonicalFrontmatter || hasCanonicalMeta;
+
   let canonicalMessage = 'Missing';
   let canonicalStatus: 'pass' | 'warning' = 'warning';
 
-  // Check framework metadata first (highest priority)
-  if (frameworkMetadata?.hasMetadata && frameworkMetadata?.fields?.canonical) {
-    hasCanonical = true;
-    canonicalMessage = 'Present (page.tsx)';
+  if (hasCanonical) {
     canonicalStatus = 'pass';
-  }
-  // Then check frontmatter and inline meta tags
-  else {
-    const hasCanonicalFrontmatter = !!frontmatter.canonical;
-    const hasCanonicalMeta = !!metaTags?.canonical;
-
-    if (hasCanonicalFrontmatter || hasCanonicalMeta) {
-      hasCanonical = true;
-      canonicalStatus = 'pass';
-
-      if (hasCanonicalFrontmatter && hasCanonicalMeta) {
-        canonicalMessage = 'Present (frontmatter + inline)';
-      } else if (hasCanonicalFrontmatter) {
-        canonicalMessage = 'Present (frontmatter)';
-      } else if (hasCanonicalMeta) {
-        canonicalMessage = 'Present (inline meta tag)';
-      }
+    if (hasCanonicalFrontmatter && hasCanonicalMeta) {
+      canonicalMessage = 'Present (frontmatter + inline)';
+    } else if (hasCanonicalFrontmatter) {
+      canonicalMessage = 'Present (frontmatter)';
+    } else if (hasCanonicalMeta) {
+      canonicalMessage = 'Present (inline meta tag)';
     }
   }
 
@@ -160,42 +174,33 @@ function buildMetaTagsCategory(
     canFix: true
   });
 
-  // Open Graph tags - framework metadata takes precedence
+  // Open Graph tags
+  const hasOGFrontmatter = frontmatter.ogTitle && frontmatter.ogDescription && frontmatter.ogImage;
+  const hasOGMeta = metaTags?.ogTitle && metaTags?.ogDescription && metaTags?.ogImage;
+
+  // Count how many OG tags are present
+  const ogCount = [
+    frontmatter.ogTitle || metaTags?.ogTitle,
+    frontmatter.ogDescription || metaTags?.ogDescription,
+    frontmatter.ogImage || metaTags?.ogImage,
+    frontmatter.ogUrl || metaTags?.ogUrl
+  ].filter(Boolean).length;
+
   let hasOG = false;
   let ogMessage = 'Missing some tags';
   let ogStatus: 'pass' | 'warning' = 'warning';
 
-  // Check framework metadata first (highest priority)
-  if (frameworkMetadata?.hasMetadata && frameworkMetadata?.fields?.openGraph) {
+  if (hasOGFrontmatter || hasOGMeta) {
     hasOG = true;
-    ogMessage = 'Present (page.tsx)';
     ogStatus = 'pass';
-  }
-  // Then check frontmatter and inline meta tags
-  else {
-    const hasOGFrontmatter = frontmatter.ogTitle && frontmatter.ogDescription && frontmatter.ogImage;
-    const hasOGMeta = metaTags?.ogTitle && metaTags?.ogDescription && metaTags?.ogImage;
 
-    // Count how many OG tags are present
-    const ogCount = [
-      frontmatter.ogTitle || metaTags?.ogTitle,
-      frontmatter.ogDescription || metaTags?.ogDescription,
-      frontmatter.ogImage || metaTags?.ogImage,
-      frontmatter.ogUrl || metaTags?.ogUrl
-    ].filter(Boolean).length;
-
-    if (hasOGFrontmatter || hasOGMeta) {
-      hasOG = true;
-      ogStatus = 'pass';
-
-      if (ogCount === 4) {
-        ogMessage = hasOGFrontmatter && hasOGMeta ? '4/4 present (frontmatter + inline)'
-                  : hasOGFrontmatter ? '4/4 present (frontmatter)'
-                  : '4/4 present (inline meta tags)';
-      } else if (ogCount > 0) {
-        ogMessage = `${ogCount}/4 present`;
-        ogStatus = 'warning'; // Partial OG is a warning
-      }
+    if (ogCount === 4) {
+      ogMessage = hasOGFrontmatter && hasOGMeta ? '4/4 present (frontmatter + inline)'
+                : hasOGFrontmatter ? '4/4 present (frontmatter)'
+                : '4/4 present (inline meta tags)';
+    } else if (ogCount > 0) {
+      ogMessage = `${ogCount}/4 present`;
+      ogStatus = 'warning'; // Partial OG is a warning
     }
   }
 
