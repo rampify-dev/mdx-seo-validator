@@ -122,8 +122,19 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
       }
     }
 
-    // Validate SEO
-    const validation = validateSEO(parsed, faviconInfo);
+    // Extract rendered metadata if available
+    const renderedMetadata = renderedHtml?.metadata ? {
+      title: renderedHtml.metadata.title,
+      description: renderedHtml.metadata.description
+    } : undefined;
+
+    // Validate SEO with rendered metadata (what Google sees) and file path for breadcrumb
+    const validation = validateSEO(
+      parsed,
+      faviconInfo,
+      renderedMetadata,
+      document.uri.fsPath
+    );
 
     // Send to webview
     this._view.webview.postMessage({

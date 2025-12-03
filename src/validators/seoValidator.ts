@@ -3,20 +3,23 @@ import type { ParsedDocument, ValidationData, Category, Rule } from '../types';
 
 export function validateSEO(
   parsed: ParsedDocument,
-  faviconInfo?: { exists: boolean; dataUri?: string; type?: string }
+  faviconInfo?: { exists: boolean; dataUri?: string; type?: string },
+  renderedMetadata?: { title: string | null; description: string | null },
+  filePath?: string
 ): ValidationData {
   const { frontmatter, headings, images, links } = parsed;
 
-  // Validate title
-  const title = frontmatter.title || '';
+  // Use rendered HTML metadata if available (what Google actually sees)
+  // Otherwise fall back to frontmatter
+  const title = renderedMetadata?.title || frontmatter.title || '';
   const titleLength = title.length;
   const titleStatus = titleLength >= 50 && titleLength <= 60 ? 'optimal'
                     : titleLength >= 30 && titleLength <= 70 ? 'warning'
                     : 'error';
   const titleTruncated = titleLength > 60 ? title.slice(0, 57) + '...' : title;
 
-  // Validate description
-  const description = frontmatter.description || '';
+  // Use rendered HTML description if available
+  const description = renderedMetadata?.description || frontmatter.description || '';
   const descLength = description.length;
   const descStatus = descLength >= 150 && descLength <= 160 ? 'optimal'
                    : descLength >= 120 && descLength <= 170 ? 'warning'
@@ -37,7 +40,9 @@ export function validateSEO(
   // Get site domain from configuration
   const config = vscode.workspace.getConfiguration('seo');
   const siteDomain = config.get<string>('siteDomain') || 'example.com';
-  const breadcrumb = `${siteDomain} › blog › post`;
+
+  // Build dynamic breadcrumb from file path
+  const breadcrumb = buildBreadcrumb(siteDomain, filePath);
 
   return {
     title: {
@@ -335,4 +340,49 @@ function calculateScore(categories: Category[]): number {
   });
 
   return Math.round(totalScore / totalWeight);
+}
+
+/**
+ * Build dynamic breadcrumb from file path
+ * Examples:
+ *   app/docs/context-driven-development/page.mdx → domain › docs › context-driven-development
+ *   content/blog/my-post.mdx → domain › blog › my-post
+ */
+function buildBreadcrumb(siteDomain: string, filePath?: string): string {
+  if (!filePath) {
+    return `${siteDomain} › blog › post`;
+  }
+
+  const pathParts = filePath.split('/');
+  const fileName = pathParts[pathParts.length - 1];
+
+  // Remove file extension
+  const slug = fileName.replace(/\.(mdx|md|tsx|jsx)$/, '');
+
+  // Find the content/app/src directory
+  const appIndex = pathParts.findIndex(part =>
+    part === 'app' || part === 'src' || part === 'content' || part === 'pages'
+  );
+
+  if (appIndex === -1) {
+    return `${siteDomain} › ${slug}`;
+  }
+
+  // Extract route parts after the framework directory
+  const routeParts = pathParts.slice(appIndex + 1);
+
+  // Remove 'pages' directory if it exists (Astro/Remix)
+  if (routeParts[0] === 'pages') {
+    routeParts.shift();
+  }
+
+  // Remove 'page' if it's the filename
+  if (slug === 'page') {
+    routeParts.pop();
+  }
+
+  // Build breadcrumb
+  const breadcrumbParts = routeParts.length > 0 ? routeParts : [slug];
+
+  return `${siteDomain} › ${breadcrumbParts.join(' › ')}`;
 }
