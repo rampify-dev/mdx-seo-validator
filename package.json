@@ -1,7 +1,7 @@
 {
   "name": "mdx-seo-validator",
   "displayName": "MDX SEO Validator",
-  "description": "SEO intelligence for developers - Real-time SEO validation for MDX/Markdown with live Google search preview in VS Code. Built for Next.js, Astro, Remix developers.",
+  "description": "VS Code extension for real-time SEO validation of MDX/Markdown with live Google preview. Validate meta tags, check SEO scores, and optimize content for Next.js, Astro, and Remix sites.",
   "version": "0.1.0",
   "publisher": "rampify",
   "engines": {
@@ -14,22 +14,24 @@
   "keywords": [
     "seo",
     "seo-tools",
-    "developer-seo",
-    "seo-intelligence",
+    "seo-validation",
+    "seo-checker",
     "mdx",
     "markdown",
     "nextjs",
     "astro",
-    "validation",
+    "remix",
     "meta-tags",
-    "schema.org",
+    "meta-tag-validator",
     "content-seo",
-    "technical-seo",
-    "ide-seo",
-    "real-time-seo",
+    "developer-tools",
+    "vscode-extension",
+    "real-time",
     "google-preview",
     "open-graph",
-    "seo-automation"
+    "schema.org",
+    "seo-linter",
+    "technical-seo"
   ],
   "activationEvents": [
     "onLanguage:mdx",

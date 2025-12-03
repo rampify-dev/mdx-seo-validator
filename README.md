@@ -2,23 +2,26 @@
 
 > **SEO intelligence in your IDE** — Real-time SEO validation for MDX/Markdown files with live Google search preview
 
-A VS Code extension that brings **SEO intelligence directly into your development workflow**. Write SEO-optimized content for Next.js, Astro, Remix, and any MDX/Markdown-based site with real-time feedback as you type. See exactly how your page will appear in Google search results without leaving your editor.
+**VS Code extension for developers building content-driven sites.** Validate meta tags, check SEO scores, and see live Google search previews as you write MDX/Markdown content. Built for Next.js, Astro, and Remix developers who want professional SEO validation without leaving their editor.
+
+Get real-time feedback on title tags, meta descriptions, Open Graph tags, heading structure, and more — all while you type.
 
 ![VS Code Extension](https://img.shields.io/badge/VS%20Code-Extension-blue?logo=visual-studio-code)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)
 
-## Why SEO Intelligence in Your IDE?
+## Why Use an SEO Validator in VS Code?
 
-**Traditional SEO tools require context switching.** You write content in your IDE, then paste it into external tools to check SEO. This breaks your flow and slows you down.
+**The Problem:** Traditional SEO checkers require pasting content into external tools. This breaks your flow and slows down development.
 
-**MDX SEO Validator brings SEO intelligence directly into VS Code:**
-- See Google search preview as you type (no context switching)
-- Catch SEO issues before committing code
-- Real-time validation with actionable feedback
-- Developer-friendly workflow (no external tools needed)
+**The Solution:** MDX SEO Validator brings real-time SEO validation directly into VS Code:
+- ✅ **Live Google search preview** as you type (no external tools)
+- ✅ **Validate meta tags** instantly (title, description, OG tags)
+- ✅ **Check SEO scores** for every page (0-100 rating)
+- ✅ **Real-time feedback** with actionable recommendations
+- ✅ **Framework-aware** for Next.js, Astro, and Remix
 
-Perfect for developers building content-heavy sites who want **professional SEO without leaving their IDE**.
+Perfect for developers building blogs, documentation sites, and content-driven applications who want **professional SEO validation without context switching**.
 
 ## Who This Is For
 
@@ -126,8 +129,8 @@ Once published, install directly from the VS Code Marketplace.
 
 ## Common Use Cases
 
-### Use Case 1: Writing a Blog Post for Next.js
-**Scenario:** You're writing a technical blog post and want to ensure it's SEO-optimized before publishing.
+### Use Case 1: Next.js Blog SEO Validation
+**Scenario:** You're writing a technical blog post for your Next.js site and want to validate SEO before publishing.
 
 ```mdx
 ---
@@ -147,8 +150,8 @@ Your content here...
 - Verifies H1 matches title
 - Ensures images have alt text
 
-### Use Case 2: Documentation Site with Astro
-**Scenario:** Building docs and want consistent SEO across all pages.
+### Use Case 2: Astro Documentation SEO
+**Scenario:** Building an Astro documentation site and need consistent SEO validation across all pages.
 
 ```mdx
 ---
@@ -163,15 +166,18 @@ The extension validates:
 - Internal link structure
 ```
 
-### Use Case 3: Content Marketing for SaaS
-**Scenario:** Writing SEO-focused content to drive organic traffic.
+### Use Case 3: Content Marketing SEO Optimization
+**Scenario:** Writing SEO-focused content to drive organic traffic to your SaaS product.
 
-The extension helps you:
-- Optimize titles for click-through rate
-- Write compelling meta descriptions
-- Validate Open Graph tags for social sharing
-- Ensure proper content structure (H1, H2, word count)
-- Preview exactly how your page appears in Google
+**The SEO validator helps you:**
+- Check meta tag optimization in real-time
+- Validate title tags are 50-60 characters (optimal for Google)
+- Ensure meta descriptions are 150-160 characters
+- Verify Open Graph tags for social media sharing
+- Preview exactly how your page appears in Google search results
+- Maintain proper heading structure (H1, H2, H3)
+
+No need for external SEO checkers — validate everything in VS Code.
 
 ## Validation Rules
 
@@ -281,23 +287,25 @@ fix: correct title length calculation
 docs: update README examples
 ```
 
-## How This Compares
+## How This Compares to Other SEO Tools
 
-### Traditional SEO Tools
-- ❌ Require pasting content into external tools
+### Traditional SEO Checkers
+- ❌ Require copying/pasting into external websites
 - ❌ Break your development workflow
-- ❌ Show generic recommendations
-- ❌ No integration with your IDE or framework
+- ❌ Generic recommendations (not developer-focused)
+- ❌ No IDE integration
+- ❌ Can't validate meta tags in real-time
 
-### MDX SEO Validator
-- ✅ **SEO intelligence in your IDE** - Never leave VS Code
-- ✅ **Real-time feedback** - See issues as you type
-- ✅ **Developer-focused** - Built for MDX/Markdown workflows
-- ✅ **Framework-aware** - Understands Next.js, Astro, Remix
-- ✅ **Live Google preview** - See exactly what users see
+### MDX SEO Validator Extension
+- ✅ **VS Code integration** - Validate SEO without leaving your editor
+- ✅ **Real-time validation** - See issues as you type
+- ✅ **Built for developers** - MDX/Markdown workflow optimization
+- ✅ **Framework-aware** - Next.js, Astro, Remix support
+- ✅ **Live Google preview** - See search results in real-time
+- ✅ **Meta tag validator** - Title, description, OG tags, schema.org
 - ✅ **Free and open source** - MIT licensed
 
-**The result:** Professional SEO without context switching. Write better content faster.
+**The result:** Professional SEO validation without context switching. Ship SEO-optimized content faster.
 
 ## About Rampify
 
