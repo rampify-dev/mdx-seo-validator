@@ -4,6 +4,7 @@
   "description": "VS Code extension for real-time SEO validation of MDX/Markdown with live Google preview. Validate meta tags, check SEO scores, and optimize content for Next.js, Astro, and Remix sites.",
   "version": "0.1.0",
   "publisher": "rampify",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.80.0"
   },
