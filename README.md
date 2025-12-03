@@ -202,7 +202,7 @@ No need for external SEO checkers — validate everything in VS Code.
 
 Configure in VS Code settings (`Cmd+,` → search "SEO"):
 
-```json
+```jsonc
 {
   "seo.framework": "auto",          // auto | nextjs-app | nextjs-pages | astro | remix | generic
   "seo.siteDomain": "example.com"   // Your site domain (for URL preview)

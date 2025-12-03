@@ -9,7 +9,7 @@ Configure the MDX SEO Validator extension through VS Code settings:
 **Default:** `example.com`
 **Description:** Your production site domain (used in Google Search Preview)
 
-```json
+```jsonc
 {
   "seo.siteDomain": "workware.dev"
 }
@@ -20,7 +20,7 @@ Configure the MDX SEO Validator extension through VS Code settings:
 **Default:** `` (empty - feature disabled)
 **Description:** Your local development server URL
 
-```json
+```jsonc
 {
   "seo.devServerUrl": "http://localhost:3000"
 }
@@ -41,7 +41,7 @@ Configure the MDX SEO Validator extension through VS Code settings:
 **Default:** `content`
 **Description:** Path to your content directory relative to workspace root
 
-```json
+```jsonc
 {
   "seo.contentPath": "content"
 }
@@ -52,7 +52,7 @@ Configure the MDX SEO Validator extension through VS Code settings:
 **Default:** `/blog/{slug}`
 **Description:** URL pattern for content pages
 
-```json
+```jsonc
 {
   "seo.urlPattern": "/blog/{slug}"
 }
@@ -63,7 +63,7 @@ The `{slug}` placeholder will be replaced with the MDX filename (without extensi
 ## Example Configurations
 
 ### Next.js Blog (Standard)
-```json
+```jsonc
 {
   "seo.siteDomain": "myblog.com",
   "seo.devServerUrl": "http://localhost:3000",
@@ -76,7 +76,7 @@ The `{slug}` placeholder will be replaced with the MDX filename (without extensi
 **Dev URL:** `http://localhost:3000/blog/my-post`
 
 ### Astro Documentation Site
-```json
+```jsonc
 {
   "seo.siteDomain": "docs.example.com",
   "seo.devServerUrl": "http://localhost:4321",
@@ -89,7 +89,7 @@ The `{slug}` placeholder will be replaced with the MDX filename (without extensi
 **Dev URL:** `http://localhost:4321/docs/getting-started`
 
 ### Remix Blog
-```json
+```jsonc
 {
   "seo.siteDomain": "remix-blog.com",
   "seo.devServerUrl": "http://localhost:3000",
