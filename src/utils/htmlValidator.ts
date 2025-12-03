@@ -179,7 +179,7 @@ function buildPageFileUrl(pathParts: string[], fileName: string, devServerUrl: s
   }
 
   // Extract route parts after app/src
-  const routeParts = pathParts.slice(appIndex + 1);
+  let routeParts = pathParts.slice(appIndex + 1);
 
   // Remove page.mdx/page.tsx from the end
   if (fileName.startsWith('page.')) {
@@ -190,6 +190,10 @@ function buildPageFileUrl(pathParts: string[], fileName: string, devServerUrl: s
   if (routeParts[0] === 'pages') {
     routeParts.shift();
   }
+
+  // Filter out Next.js route groups (directories in parentheses like "(marketing)")
+  // These are for organization only and don't affect the URL
+  routeParts = routeParts.filter(part => !(part.startsWith('(') && part.endsWith(')')));
 
   // Build URL path
   const urlPath = routeParts.length > 0 ? '/' + routeParts.join('/') : '/';

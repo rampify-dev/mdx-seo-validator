@@ -351,6 +351,7 @@ function calculateScore(categories: Category[]): number {
  */
 function buildBreadcrumb(siteDomain: string, pageUrl?: string): string {
   if (!pageUrl) {
+    console.log('[SEO Validator] No pageUrl provided for breadcrumb');
     return siteDomain;
   }
 
@@ -359,14 +360,19 @@ function buildBreadcrumb(siteDomain: string, pageUrl?: string): string {
     const url = new URL(pageUrl);
     const pathParts = url.pathname.split('/').filter(Boolean);
 
+    console.log('[SEO Validator] Building breadcrumb from URL:', pageUrl, '→', pathParts);
+
     if (pathParts.length === 0) {
       return siteDomain;
     }
 
     // Build breadcrumb from URL path
-    return `${siteDomain} › ${pathParts.join(' › ')}`;
+    const breadcrumb = `${siteDomain} › ${pathParts.join(' › ')}`;
+    console.log('[SEO Validator] Final breadcrumb:', breadcrumb);
+    return breadcrumb;
   } catch (error) {
     // If URL parsing fails, return just domain
+    console.log('[SEO Validator] Failed to parse URL:', pageUrl, error);
     return siteDomain;
   }
 }
