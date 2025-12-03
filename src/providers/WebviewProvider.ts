@@ -128,12 +128,12 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
       description: renderedHtml.metadata.description
     } : undefined;
 
-    // Validate SEO with rendered metadata (what Google sees) and file path for breadcrumb
+    // Validate SEO with rendered metadata and URL (Rampify approach: URLs are source of truth)
     const validation = validateSEO(
       parsed,
       faviconInfo,
       renderedMetadata,
-      document.uri.fsPath
+      renderedHtml?.url || pageUrl || undefined
     );
 
     // Send to webview

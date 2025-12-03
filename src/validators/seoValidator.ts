@@ -5,7 +5,7 @@ export function validateSEO(
   parsed: ParsedDocument,
   faviconInfo?: { exists: boolean; dataUri?: string; type?: string },
   renderedMetadata?: { title: string | null; description: string | null },
-  filePath?: string
+  pageUrl?: string
 ): ValidationData {
   const { frontmatter, headings, images, links } = parsed;
 
@@ -41,8 +41,8 @@ export function validateSEO(
   const config = vscode.workspace.getConfiguration('seo');
   const siteDomain = config.get<string>('siteDomain') || 'example.com';
 
-  // Build dynamic breadcrumb from file path
-  const breadcrumb = buildBreadcrumb(siteDomain, filePath);
+  // Build breadcrumb from URL (source of truth, like Rampify)
+  const breadcrumb = buildBreadcrumb(siteDomain, pageUrl);
 
   return {
     title: {
@@ -343,46 +343,30 @@ function calculateScore(categories: Category[]): number {
 }
 
 /**
- * Build dynamic breadcrumb from file path
+ * Build breadcrumb from URL (aligns with Rampify's URL-based approach)
  * Examples:
- *   app/docs/context-driven-development/page.mdx → domain › docs › context-driven-development
- *   content/blog/my-post.mdx → domain › blog › my-post
+ *   http://localhost:3000/docs/context-driven-development → domain › docs › context-driven-development
+ *   http://localhost:3000/blog/my-post → domain › blog › my-post
+ *   http://localhost:3000/ → domain
  */
-function buildBreadcrumb(siteDomain: string, filePath?: string): string {
-  if (!filePath) {
-    return `${siteDomain} › blog › post`;
+function buildBreadcrumb(siteDomain: string, pageUrl?: string): string {
+  if (!pageUrl) {
+    return siteDomain;
   }
 
-  const pathParts = filePath.split('/');
-  const fileName = pathParts[pathParts.length - 1];
+  try {
+    // Parse URL to get the path
+    const url = new URL(pageUrl);
+    const pathParts = url.pathname.split('/').filter(Boolean);
 
-  // Remove file extension
-  const slug = fileName.replace(/\.(mdx|md|tsx|jsx)$/, '');
+    if (pathParts.length === 0) {
+      return siteDomain;
+    }
 
-  // Find the content/app/src directory
-  const appIndex = pathParts.findIndex(part =>
-    part === 'app' || part === 'src' || part === 'content' || part === 'pages'
-  );
-
-  if (appIndex === -1) {
-    return `${siteDomain} › ${slug}`;
+    // Build breadcrumb from URL path
+    return `${siteDomain} › ${pathParts.join(' › ')}`;
+  } catch (error) {
+    // If URL parsing fails, return just domain
+    return siteDomain;
   }
-
-  // Extract route parts after the framework directory
-  const routeParts = pathParts.slice(appIndex + 1);
-
-  // Remove 'pages' directory if it exists (Astro/Remix)
-  if (routeParts[0] === 'pages') {
-    routeParts.shift();
-  }
-
-  // Remove 'page' if it's the filename
-  if (slug === 'page') {
-    routeParts.pop();
-  }
-
-  // Build breadcrumb
-  const breadcrumbParts = routeParts.length > 0 ? routeParts : [slug];
-
-  return `${siteDomain} › ${breadcrumbParts.join(' › ')}`;
 }
