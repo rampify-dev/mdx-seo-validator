@@ -10,6 +10,23 @@ Get real-time feedback on title tags, meta descriptions, Open Graph tags, headin
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)
 
+## Screenshots
+
+### Live Google Search Preview
+See exactly how your page will appear in search results as you type.
+
+![Google Search Preview](.github/images/screenshot-1-google-preview.png)
+
+### SEO Validation Panel
+Get instant feedback with detailed validation rules and actionable recommendations.
+
+![SEO Validation Panel](.github/images/screenshot-2-validation-panel.png)
+
+### Simple Configuration
+Configure the extension for your framework in VS Code settings.
+
+![Settings Configuration](.github/images/screenshot-3-settings.png)
+
 ## Why Use an SEO Validator in VS Code?
 
 **The Problem:** Traditional SEO checkers require pasting content into external tools. This breaks your flow and slows down development.
