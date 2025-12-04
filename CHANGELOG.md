@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2024-12-03
+
+### Fixed
+- Added helpful message when MDX files are not recognized (missing MDX extension)
+- Improved user experience by detecting when users need to install the "MDX" extension by unifiedjs
+- Fixed variable scoping issue in HTML validator
+
+## [1.0.1] - 2024-12-02
+
+### Changed
+- Optimized package size with .vscodeignore (13 MB → 614 KB)
+
+## [1.0.0] - 2024-12-02
+
+### Changed
+- First stable release published to VS Code Marketplace
+- Optimized README and keywords for discoverability
+
 ## [0.1.0] - 2025-01-26
 
 ### Added

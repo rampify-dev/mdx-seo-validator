@@ -31,15 +31,14 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
         case 'ready':
           // Webview is ready, send initial data
           const editor = vscode.window.activeTextEditor;
-          if (editor && (editor.document.languageId === 'mdx' || editor.document.languageId === 'markdown')) {
+          if (editor) {
+            // Use validateDocument which handles all cases including MDX detection
             this.validateDocument(editor.document);
           } else {
-            // No valid file open, show prompt
+            // No file open at all
             this._view?.webview.postMessage({
               type: 'no-file',
-              message: editor
-                ? 'Open an MDX or Markdown file to see SEO validation'
-                : 'Open an MDX or Markdown file to see SEO validation'
+              message: 'Open an MDX or Markdown file to see SEO validation'
             });
           }
           break;
@@ -54,6 +53,18 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 
   public async validateDocument(document: vscode.TextDocument) {
     if (!this._view) {
+      return;
+    }
+
+    // Check if this is an .mdx file that's not recognized as MDX language
+    const isMdxFile = document.fileName.toLowerCase().endsWith('.mdx');
+
+    if (isMdxFile && document.languageId === 'plaintext') {
+      // .mdx file not recognized - user needs MDX extension
+      this._view.webview.postMessage({
+        type: 'no-file',
+        message: 'MDX file detected. Install the "MDX" extension by unifiedjs to enable validation.'
+      });
       return;
     }
 
@@ -88,6 +99,7 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
 
     // Validate rendered HTML if dev server is configured
     let renderedHtml;
+    let pageUrl: string | null = null;
     const config = vscode.workspace.getConfiguration('seo');
     const devServerUrl = config.get<string>('devServerUrl');
 
@@ -95,7 +107,7 @@ export class SEOWebviewProvider implements vscode.WebviewViewProvider {
       const contentPath = config.get<string>('contentPath') || 'content';
       const urlPattern = config.get<string>('urlPattern') || '/blog/{slug}';
 
-      const pageUrl = buildUrlFromPath(
+      pageUrl = buildUrlFromPath(
         document.uri.fsPath,
         devServerUrl.replace(/\/$/, ''), // Remove trailing slash
         contentPath,
